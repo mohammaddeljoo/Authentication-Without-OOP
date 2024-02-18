@@ -20,3 +20,12 @@ function setErrorAndRedirect(string $message , string $target) : void {
     $_SESSION['error'] = $message;
     redirect( site_url($target));
 }
+
+function vp($data){
+    echo '<pre>';
+    var_dump($data);
+    echo '</pre>';
+    echo '<pre>';
+    print_r($data);
+    echo '</pre>';
+}

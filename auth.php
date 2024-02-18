@@ -25,7 +25,25 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             redirect('auth.php?action=verify');
         }
     }
+
 }
+
+
+
+if(isset($_GET['action']) and $_GET['action'] == 'verify' and !empty($_SESSION['email'])){
+    #جک کنیم ببینیم این ایمیل در سشن هست یا نه
+    if(!isUserExists($_SESSION['email']))
+        setErrorAndRedirect('User - Not - Exist with this data','auth.php?action=login');
+
+    if(isset($_SESSION['hash']) and isAliveToken($_SESSION['hash'])){
+    
+    }else{
+        $tokenResult = createLoginToken();
+        $_SESSION['hash'] = $tokenResult['hash'];
+    }
+    include 'tpl/verify-tpl.php';
+}
+
 
 
 
