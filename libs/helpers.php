@@ -11,7 +11,7 @@ function site_url($url = '')
     return BASE_URL .  $url;
 }
 
-function redirect($target){
+function redirect($target = BASE_URL){
     header('Location:' . $target);
     die();
 }

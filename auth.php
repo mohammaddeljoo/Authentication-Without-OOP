@@ -1,6 +1,10 @@
 <?php
 require "bootstrap/init.php";
 
+if(isLoggedIn()){
+    redirect();
+}
+
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
    $action = $_GET['action'];
     $params = $_POST;
@@ -26,8 +30,26 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
     }
 
-}
+    if($action == 'verify'){
+        $token = findTokenByHash($_SESSION['hash'])->token;
+        if($token === $params['token']){
+            $session = bin2hex(random_bytes(32));
+            changeLoginSession($session , $_SESSION['email']);
+            setcookie('auth',$session,time() + 1728000, '/');
+            deleteTokenByHash($_SESSION['hash']);
+            unset($_SESSION['hash'], $_SESSION['email']);
+            redirect();
 
+        }else{
+            setErrorAndRedirect('this token is wrong','auth.php?action=verify');
+
+        }
+    }
+
+}
+// if($action == 'verify'){
+//     vp("$params");
+// }
 
 
 if(isset($_GET['action']) and $_GET['action'] == 'verify' and !empty($_SESSION['email'])){
@@ -36,9 +58,12 @@ if(isset($_GET['action']) and $_GET['action'] == 'verify' and !empty($_SESSION['
         setErrorAndRedirect('User - Not - Exist with this data','auth.php?action=login');
 
     if(isset($_SESSION['hash']) and isAliveToken($_SESSION['hash'])){
-    
+        sendTokenByMail($_SESSION['email'], findTokenByHash($_SESSION['hash'])->token);
+
     }else{
         $tokenResult = createLoginToken();
+        sendTokenByMail($_SESSION['email'], $tokenResult['token']);
+
         $_SESSION['hash'] = $tokenResult['hash'];
     }
     include 'tpl/verify-tpl.php';

@@ -52,7 +52,52 @@ function findTokenByHash($hash) : object|bool {
 }
 
 #send token
+function sendTokenByMail(string $email, string|int $token): bool
+{
+    global $mail;
+    $mail->addAddress($email);
+    $mail->Subject = 'M.deljoo Verify Token';
+    $mail->Body = 'Your token is: ' . $token;
+    return $mail->send();
+}
 
 #verify
 
 #login
+
+#change login
+function changeLoginSession(string $session, string $email) : bool {
+    global $pdo;
+
+    $sql = 'UPDATE `users` SET `session` = :session WHERE `email` = :email;';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':session' => $session , ':email' => $email]);
+    return $stmt->rowCount() ? true : false ;
+
+    
+}
+function deleteTokenByHash(string $hash) : bool {
+    global $pdo;
+    
+    $sql = 'DELETE FROM `tokens` WHERE hash = :hash;';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':hash' => $hash]);
+    return $stmt->rowCount() ? true : false ;
+    
+}
+
+function getAuthenticateBySession($session) : bool|object {
+
+    global $pdo;
+    $sql = 'SELECT * FROM `users` WHERE `session` = :session;';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':session' => $session]);
+    return $stmt->fetch(PDO::FETCH_OBJ);
+}
+
+function isLoggedIn() : bool {
+    if(empty($_COOKIE['auth']))
+        return false;
+    return getAuthenticateBySession($_COOKIE['auth']) ? true : false;
+    
+}

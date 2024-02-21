@@ -1,14 +1,11 @@
 <?php
 
-$maile = new \PHPMailer\PHPMailer\PHPMailer();
-
-$maile->isSMTP();
-$maile->Host = 'sandbox.smtp.mailetrap.io';
-$maile->SMTPAuth = true;
-$maile->Port = 2525;
-$maile->Username = '36a93dbd178b91';
-$maile->Password = '549affa74fc9bd';
-$maile->setFrom('mohammaddeljoo1@gmail.com', 'Mailer');
-
-// $mail->setFrom('M.deljoo@auth.com','auth deljoo');
-$maile->isHTML(true); 
+$mail = new PHPMailer\PHPMailer\PHPMailer();
+$mail->isSMTP();
+$mail->Host = 'sandbox.smtp.mailtrap.io';
+$mail->SMTPAuth = true;
+$mail->Port = 25;
+$mail->Username = '36a93dbd178b91';
+$mail->Password = '549affa74fc9bd';
+$mail->setFrom('auth@7auth.mg', '7Auth Project');
+$mail->isHtml(true);
