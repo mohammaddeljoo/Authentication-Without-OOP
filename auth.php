@@ -4,6 +4,7 @@ require "bootstrap/init.php";
 if(isLoggedIn()){
     redirect();
 }
+deleteEcpiredToken();
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
    $action = $_GET['action'];
@@ -30,11 +31,25 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
     }
 
+    if($action == 'login'){
+         if(empty($params['email']))
+             setErrorAndRedirect('email Input Fields Reqired','auth.php?action=login');
+         if(!filter_var($params['email'],FILTER_VALIDATE_EMAIL))
+             setErrorAndRedirect('Please Enter Valid Email Adress.!','auth.php?action=login');
+         if(!isUserExists($params['email']))
+             setErrorAndRedirect('User not Exist with this email <br>'. $params['email'] ,'auth.php?action=login');
+          $_SESSION['email'] = $params['email'];
+         redirect('auth.php?action=verify');
+        vp("$params");
+    }
+
+
+
     if($action == 'verify'){
         $token = findTokenByHash($_SESSION['hash'])->token;
         if($token === $params['token']){
             $session = bin2hex(random_bytes(32));
-            changeLoginSession($session , $_SESSION['email']);
+            changeLoginSession( $_SESSION['email'] ,$session);
             setcookie('auth',$session,time() + 1728000, '/');
             deleteTokenByHash($_SESSION['hash']);
             unset($_SESSION['hash'], $_SESSION['email']);
